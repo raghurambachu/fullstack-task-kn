@@ -17,3 +17,5 @@ Note: Also Vongage allows to send sms to only registered numbers in case of Free
 ## Start the server & client(Basically is a create-react-app)
 
 `npm run startboth` will start both server and client, client by default runs at PORT-3000 and server at PORT-3001
+
+#### Database is not being used rather once a request is done, the data is being stored in localstorage[As per the guidelines choose the best way.]
