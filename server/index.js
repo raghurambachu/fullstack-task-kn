@@ -1,5 +1,6 @@
 const express = require("express");
 const Vonage = require("@vonage/server-sdk");
+var bodyParser = require("body-parser");
 require("dotenv").config();
 
 const vonage = new Vonage({
@@ -8,27 +9,37 @@ const vonage = new Vonage({
 });
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.post("/send", (req, res) => {
-  //   const from = "Raghuram Bachu";
-  //   const to = "917021425912";
-  //   const text = "A text message sent using the Nexmo by Raghuram Bachu";
-  //   vonage.message.sendSms(from, to, text, (err, responseData) => {
-  //     if (err) {
-  //       console.log(err);
-  //       res.json({ msg: err });
-  //     } else {
-  //       if (responseData.messages[0]["status"] === "0") {
-  //         console.log("Message sent successfully.");
-  //         res.json({ msg: responseData });
-  //       } else {
-  //         console.log(
-  //           `Message failed with error: ${responseData.messages[0]["error-text"]}`
-  //         );
-  //         res.json({ msg: responseData });
-  //       }
-  //     }
-  //   });
+  if (!req.body.user || !req.body.message) {
+    return res.json({ msg: "Body should have the both user info and message" });
+  }
+  const { user, message } = req.body;
+
+  const from = "Raghuram Bachu";
+  const to = "91" + user.mobile;
+  vonage.message.sendSms(from, to, message, (err, responseData) => {
+    if (err) {
+      res.json({ msg: err, status: "failed" });
+    } else {
+      if (responseData.messages[0]["status"] === "0") {
+        res.json({
+          msg: `Message sent successfully to ${user.firstName}`,
+          user,
+          message,
+          status: "successful",
+          date: Date.now(),
+        });
+      } else {
+        res.json({
+          msg: responseData.messages[0]["error-text"],
+          status: "failed",
+        });
+      }
+    }
+  });
 });
 
 const port = process.env.SERVER_PORT;

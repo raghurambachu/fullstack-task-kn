@@ -1,37 +1,70 @@
 import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import ContactInfo from "./ContactInfo";
-import ContactList from "./ContactList";
-import SendMessage from "./SendMessage";
+import AppContext from "../context/AppContext";
 
-// import axios from "axios";
-
-// function hitBackend() {
-//   axios.get("/test").then((res) => console.log(res.data));
-// }
+import ContactsPage from "./ContactsPage";
+import SentMessages from "./SentMessages";
 
 function App() {
   const [contacts, setContacts] = useState([]);
+  const [activePage, setActivePage] = useState("contacts");
+  const [notification, setNotification] = useState("");
+  const [sentMessages, setSentMessages] = useState([]);
   useEffect(() => {
     setContacts(getContacts());
+    if (localStorage.sentMessages) {
+      setSentMessages(JSON.parse(localStorage.sentMessages));
+    }
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-200 pt-16">
-      <div className="flex justify-center space-x-8 text-lg">
-        <button>Contacts</button>
-        <button>Messages Sent</button>
-      </div>
-      {/* className="card max-w-4xl mx-auto bg-gray-100 shadow-lg rounded-md p-4 " */}
-      <div>
-        <div className="text-center text-gray-700">
-          <h3 className="text-xl mt-2">List of Contacts</h3>
-          {/* <ContactList contacts={contacts} /> */}
-          {/* {contacts.length && <ContactInfo contact={contacts[0]} />} */}
-          <SendMessage />
+    <AppContext.Provider
+      value={{ setNotification, setActivePage, setSentMessages }}
+    >
+      <div className="min-h-screen bg-gray-200 pt-16">
+        <div className="flex justify-center pt-4 space-x-8 text-lg">
+          <button
+            className={`${
+              activePage === "contacts"
+                ? "bg-blue-400 hover:bg-blue-500 focus:outline-none px-3 rounded shadow-md py-2 text-blue-100"
+                : "focus:outline-none"
+            }`}
+            onClick={() => setActivePage("contacts")}
+          >
+            Contacts
+          </button>
+          <button
+            className={`${
+              activePage === "sent-messages"
+                ? "bg-blue-400 hover:bg-blue-500 focus:outline-none px-3 rounded shadow-md py-2 text-blue-100"
+                : "focus:outline-none"
+            }`}
+            onClick={() => setActivePage("sent-messages")}
+          >
+            Messages Sent
+          </button>
         </div>
+        {/* className="card max-w-4xl mx-auto bg-gray-100 shadow-lg rounded-md p-4 " */}
+
+        <div className="max-h-80">
+          {activePage === "contacts" ? (
+            <ContactsPage
+              setNotification={setNotification}
+              contacts={contacts}
+            />
+          ) : (
+            <SentMessages
+              setNotification={setNotification}
+              sentMessages={sentMessages}
+            />
+          )}
+        </div>
+        {notification && (
+          <small className="text-gray-800 block my-4 text-center">
+            {notification}
+          </small>
+        )}
       </div>
-    </div>
+    </AppContext.Provider>
   );
 }
 
@@ -42,25 +75,25 @@ function getContacts() {
     {
       firstName: "Raghuram",
       lastName: "Bachu",
-      id: uuidv4(),
+      id: 10001,
       mobile: "7021425912",
     },
     {
       firstName: "Radha",
       lastName: "Bachu",
-      id: uuidv4(),
-      mobile: "7021425912",
+      id: 10002,
+      mobile: "9869483038",
     },
     {
       firstName: "Jayaram",
       lastName: "Ganapathy",
-      id: uuidv4(),
+      id: 10003,
       mobile: "7021425912",
     },
     {
       firstName: "Sudhanshu",
       lastName: "Shekar",
-      id: uuidv4(),
+      id: 10004,
       mobile: "7021425912",
     },
   ];
